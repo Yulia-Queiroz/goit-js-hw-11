@@ -35,21 +35,31 @@ function onFormSubmit(evt) {
         Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.'
         );
+        loadMoreBtn.classList.add('is-hidden');
         formEl.reset();
         return;
       } else if (pixabayApiService.searchQuery === '') {
         Notify.warning('Please, enter something.');
+        loadMoreBtn.classList.add('is-hidden');
         return;
       }
+
       Notify.success(`Hooray! We found ${data.totalHits} images.`);
       createGalleryMarkup(data.hits);
-
       lightboxGallery.refresh();
+      formEl.reset();
+
+      if (galleryContainer.childElementCount >= data.totalHits) {
+        loadMoreBtn.classList.add('is-hidden');
+        return;
+      }
 
       loadMoreBtn.classList.remove('is-hidden');
-      formEl.reset();
     })
-    .catch(error => console.log(error.message));
+    .catch(error => {
+      console.log(error.message);
+      loadMoreBtn.classList.add('is-hidden');
+    });
 }
 
 function onLoadMore() {
